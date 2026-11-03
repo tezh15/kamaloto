@@ -1,0 +1,42 @@
+.app-shell {
+  min-height: 100vh;
+  padding: 28px clamp(18px, 5vw, 72px) 48px;
+}
+
+.content-grid {
+  display: grid;
+  max-width: 1120px;
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr) 315px;
+  gap: 22px;
+  align-items: start;
+}
+
+.list-stack,
+.side-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.footer-note2 {
+  display: flex;
+  justify-content: center;
+}
+
+.footer-note {
+  max-width: 1120px;
+  margin: 22px auto 0;
+  color: var(--color-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding-top: 18px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}

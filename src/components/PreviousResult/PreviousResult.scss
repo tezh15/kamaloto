@@ -1,0 +1,93 @@
+.result-panel {
+  padding: 22px;
+}
+
+.result-panel .eyebrow {
+  color: var(--color-primary);
+  font-size: 10px;
+}
+
+.result-panel .eyebrow-dot {
+  background: var(--color-success);
+}
+
+.result-panel h2 {
+  margin: 16px 0 4px;
+  font-size: 17px;
+  letter-spacing: -0.04em;
+}
+
+.result-date,
+.result-schedule,
+.result-note,
+.result-source {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.result-schedule {
+  margin-top: 5px;
+}
+
+.result-date {
+  text-transform: capitalize;
+}
+
+.winning-result {
+  display: grid;
+  justify-items: start;
+  margin-top: 14px;
+}
+
+.winning-number {
+  display: grid;
+  width: 66px;
+  height: 66px;
+  margin-top: 14px;
+  place-items: center;
+  border: 1px solid var(--color-primary);
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-gold);
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 24px rgb(var(--color-accent-rgb) / 16%);
+}
+
+.winning-caption {
+  margin: 9px 0 0;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.result-note {
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+.result-error {
+  color: var(--color-error);
+}
+
+.result-fallback-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.result-fallback-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.result-source {
+  margin-top: 16px;
+  font-size: 10px;
+}

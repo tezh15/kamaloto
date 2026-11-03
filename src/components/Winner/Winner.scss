@@ -1,0 +1,54 @@
+.winner-panel {
+  padding: 22px;
+}
+
+.winner-panel .eyebrow {
+  color: var(--color-primary);
+  font-size: 10px;
+}
+
+.winner-panel .eyebrow-dot {
+  background: var(--color-success);
+}
+
+.winner-panel h2 {
+  margin: 16px 0 12px;
+  font-size: 17px;
+  letter-spacing: -0.04em;
+}
+
+.winner-details {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.winner-number {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  place-items: center;
+  border: 1px solid var(--color-primary);
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-gold);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.winner-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.winner-caption,
+.winner-note {
+  margin: 7px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}

@@ -1,0 +1,64 @@
+.accumulated-panel {
+  padding: 22px;
+}
+
+.accumulated-panel .eyebrow {
+  color: var(--color-primary);
+  font-size: 10px;
+}
+
+.accumulated-panel .eyebrow-dot {
+  background: var(--color-success);
+}
+
+.accumulated-panel h2 {
+  margin: 16px 0 6px;
+  font-size: 17px;
+  letter-spacing: -0.04em;
+}
+
+.accumulated-amount {
+  margin: 12px 0 0;
+  color: var(--color-accent);
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  overflow-wrap: anywhere;
+}
+
+.accumulated-currency {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.accumulated-detail {
+  margin: 12px 0 0;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.accumulated-breakdown {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.accumulated-breakdown p {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.accumulated-breakdown p span:last-child {
+  color: var(--color-text);
+  text-align: right;
+  white-space: nowrap;
+}
