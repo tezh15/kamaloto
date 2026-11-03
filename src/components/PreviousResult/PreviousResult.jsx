@@ -120,7 +120,7 @@ function PreviousResult({ onResultChange }) {
           </a>
         </div>
       )}
-
+      
       {status === "loaded" && (result ? (
         <div className="winning-result">
           <p className="result-date">
