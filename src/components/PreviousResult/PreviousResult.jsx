@@ -70,7 +70,7 @@ function PreviousResult({ onResultChange }) {
         setStatus("loaded");
       } catch (error) {
         if (disposed) return;
-        console.error("No se pudo cargar el resultado de la Lotería del Valle:", error);
+        console.log("No se pudo cargar el resultado de la Lotería del Valle:", error);
         if (!hasLoadedResult) {
           onResultChange({ status: "error", result: null });
         } else {

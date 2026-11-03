@@ -2,26 +2,28 @@ import React, { useState } from "react";
 import "./LoginModal.scss";
 import kamalotoLogo from "url:../../../public/assets/kamaloto.png";
 
-const ADMIN_USER = process.env.ADMIN_USER || "";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
-
 function LoginModal({ onLogin, onContinueAsGuest }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    if (!ADMIN_USER || !ADMIN_PASSWORD) {
-      setError("El acceso del organizador no está configurado.");
-      return;
-    }
-    if (username !== ADMIN_USER || password !== ADMIN_PASSWORD) {
-      setError("Usuario o contraseña incorrectos.");
-      return;
-    }
     setError("");
-    onLogin();
+    setSubmitting(true);
+    try {
+      await onLogin(username, password);
+    } catch (loginError) {
+      if (loginError?.message === "Esta cuenta no está autorizada como organizador.") {
+        setError(loginError.message);
+      } else {
+        console.log("No se pudo iniciar sesión:", loginError);
+        setError("No se pudo iniciar sesión. Comprueba el correo y la contraseña.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -39,13 +41,14 @@ function LoginModal({ onLogin, onContinueAsGuest }) {
         <p className="login-intro">Inicia sesión para administrar las inscripciones y los números del sorteo.</p>
         <form onSubmit={handleSubmit}>
           <div className="field">
-            <label htmlFor="admin-user">Usuario del organizador</label>
+            <label htmlFor="admin-user">Correo del organizador</label>
             <input
               autoComplete="username"
               id="admin-user"
               onChange={(event) => setUsername(event.target.value)}
-              placeholder="Tu usuario"
+              placeholder="nombre@ejemplo.com"
               required
+              type="email"
               value={username}
             />
           </div>
@@ -62,7 +65,9 @@ function LoginModal({ onLogin, onContinueAsGuest }) {
             />
           </div>
           {error && <p className="form-error" role="alert">{error}</p>}
-          <button className="button button-dark" type="submit">Entrar al sorteo <span aria-hidden="true">→</span></button>
+          <button className="button button-dark" disabled={submitting} type="submit">
+            {submitting ? "Iniciando sesión..." : "Entrar al sorteo"} <span aria-hidden="true">→</span>
+          </button>
         </form>
         <button
           className="button button-light guest-button"

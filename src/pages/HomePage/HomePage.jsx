@@ -23,7 +23,7 @@ function readTicketPrice() {
     const parsed = JSON.parse(saved);
     return TICKET_PRICES.includes(parsed) ? parsed : DEFAULT_TICKET_PRICE;
   } catch (error) {
-    console.error("No se pudo leer el precio del puesto:", error);
+    console.log("No se pudo leer el precio del puesto:", error);
     return DEFAULT_TICKET_PRICE;
   }
 }
@@ -46,7 +46,7 @@ function readPeople() {
         person.number <= 99,
     );
   } catch (error) {
-    console.error("No se pudo leer la lista guardada:", error);
+    console.log("No se pudo leer la lista guardada:", error);
     return [];
   }
 }
@@ -61,6 +61,7 @@ function HomePage({ authenticated, onLogin, onLogout }) {
   const [number, setNumber] = useState("");
   const [message, setMessage] = useState("");
   const [storageError, setStorageError] = useState("");
+  const [logoutError, setLogoutError] = useState("");
   const winningNumber = lotteryResult.result?.winningNumber;
   const winner = winningNumber
     ? people.find((person) => person.number === Number(winningNumber))
@@ -69,9 +70,15 @@ function HomePage({ authenticated, onLogin, onLogout }) {
   const totalPrize = people.length * ticketPrice;
   const winnerPrize = totalPrize - Math.floor(totalPrize * 0.1);
 
-  function handleLogout() {
-    onLogout();
-    setLoginModalOpen(true);
+  async function handleLogout() {
+    setLogoutError("");
+    try {
+      await onLogout();
+      setLoginModalOpen(true);
+    } catch (error) {
+      console.log("No se pudo cerrar la sesión:", error);
+      setLogoutError("No se pudo cerrar la sesión. Inténtalo de nuevo.");
+    }
   }
 
   useEffect(() => {
@@ -80,7 +87,7 @@ function HomePage({ authenticated, onLogin, onLogout }) {
       window.localStorage.setItem(PRICE_STORAGE_KEY, JSON.stringify(ticketPrice));
       setStorageError("");
     } catch (error) {
-      console.error("No se pudieron guardar los datos del sorteo:", error);
+      console.log("No se pudieron guardar los datos del sorteo:", error);
       setStorageError("No se pudieron guardar los cambios en este navegador.");
     }
   }, [people, ticketPrice]);
@@ -127,6 +134,7 @@ function HomePage({ authenticated, onLogin, onLogout }) {
           onLoginClick={() => setLoginModalOpen(true)}
           onLogout={handleLogout}
         />
+        {logoutError && <p className="form-error" role="alert">{logoutError}</p>}
         <HeroSection peopleCount={people.length} />
 
         <div className="content-grid">
