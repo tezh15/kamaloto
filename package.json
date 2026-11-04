@@ -10,11 +10,13 @@
   "dependencies": {
     "@firebase/app": "0.16.2",
     "@firebase/auth": "1.13.6",
+    "@firebase/firestore": "^4.17.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.16.4",
+    "buffer": "^6.0.3",
     "parcel": "^2.14.0",
     "sass": "^1.107.1"
   }

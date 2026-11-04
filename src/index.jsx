@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "@firebase/auth";
 import "./styles/global.scss";
+import { AppProvider } from "./context";
 import { auth } from "./firebase";
 import HomePage from "./pages/HomePage/HomePage";
 
@@ -53,11 +54,13 @@ function App() {
   }
 
   return (
-    <HomePage
-      authenticated={authenticated}
-      onLogin={handleLogin}
-      onLogout={handleLogout}
-    />
+    <AppProvider>
+      <HomePage
+        authenticated={authenticated}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+      />
+    </AppProvider>
   );
 }
 

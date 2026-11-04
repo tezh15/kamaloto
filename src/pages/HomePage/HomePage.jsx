@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./HomePage.scss";
 import Accumulated from "../../components/Accumulated/Accumulated";
 import AdminPanel from "../../components/AdminPanel/AdminPanel";
@@ -10,57 +10,24 @@ import RegistrationForm from "../../components/RegistrationForm/RegistrationForm
 import SiteHeader from "../../components/SiteHeader/SiteHeader";
 import Winner from "../../components/Winner/Winner";
 import WinnerPopup from "../../components/WinnerPopup/WinnerPopup";
-
-const STORAGE_KEY = "kamaloto.people.v1";
-const PRICE_STORAGE_KEY = "kamaloto.ticket-price.v1";
-const DEFAULT_TICKET_PRICE = 500000;
-const TICKET_PRICES = [500000, 1000000];
-
-function readTicketPrice() {
-  try {
-    const saved = window.localStorage.getItem(PRICE_STORAGE_KEY);
-    if (!saved) return DEFAULT_TICKET_PRICE;
-    const parsed = JSON.parse(saved);
-    return TICKET_PRICES.includes(parsed) ? parsed : DEFAULT_TICKET_PRICE;
-  } catch (error) {
-    console.log("No se pudo leer el precio del puesto:", error);
-    return DEFAULT_TICKET_PRICE;
-  }
-}
-
-function readPeople() {
-  try {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (!saved) return [];
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      throw new Error("El formato guardado no es válido.");
-    }
-
-    return parsed.filter(
-      (person) =>
-        person &&
-        typeof person.name === "string" &&
-        Number.isInteger(person.number) &&
-        person.number >= 0 &&
-        person.number <= 99,
-    );
-  } catch (error) {
-    console.log("No se pudo leer la lista guardada:", error);
-    return [];
-  }
-}
+import { useAppContext } from "../../context";
 
 function HomePage({ authenticated, onLogin, onLogout }) {
-  const [people, setPeople] = useState(readPeople);
-  const [ticketPrice, setTicketPrice] = useState(readTicketPrice);
+  const {
+    people,
+    ticketPrice,
+    dataStatus,
+    dataError,
+    addPerson,
+    clearDraw,
+    updateTicketPrice,
+  } = useAppContext();
   const [lotteryResult, setLotteryResult] = useState({ status: "loading", result: null });
   const [dismissedWinnerKey, setDismissedWinnerKey] = useState("");
   const [loginModalOpen, setLoginModalOpen] = useState(!authenticated);
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [message, setMessage] = useState("");
-  const [storageError, setStorageError] = useState("");
   const [logoutError, setLogoutError] = useState("");
   const winningNumber = lotteryResult.result?.winningNumber;
   const winner = winningNumber
@@ -81,18 +48,7 @@ function HomePage({ authenticated, onLogin, onLogout }) {
     }
   }
 
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(people));
-      window.localStorage.setItem(PRICE_STORAGE_KEY, JSON.stringify(ticketPrice));
-      setStorageError("");
-    } catch (error) {
-      console.log("No se pudieron guardar los datos del sorteo:", error);
-      setStorageError("No se pudieron guardar los cambios en este navegador.");
-    }
-  }, [people, ticketPrice]);
-
-  function handleAddPerson(event) {
+  async function handleAddPerson(event) {
     event.preventDefault();
     const normalizedName = name.trim();
     const selectedNumber = Number(number);
@@ -105,25 +61,45 @@ function HomePage({ authenticated, onLogin, onLogout }) {
       setMessage("El número debe estar entre 00 y 99.");
       return;
     }
-    if (people.some((person) => person.number === selectedNumber)) {
-      setMessage(`El número ${selectedNumber} ya está registrado.`);
+    if (dataStatus !== "ready") {
+      setMessage("Los datos del sorteo aún no están disponibles. Inténtalo de nuevo en un momento.");
       return;
     }
 
-    setPeople((current) => [...current, { name: normalizedName, number: selectedNumber }]);
-    setName("");
-    setNumber("");
-    setMessage(`${normalizedName} quedó inscrito con el número ${selectedNumber}.`);
+    try {
+      await addPerson({ name: normalizedName, number: selectedNumber });
+      setName("");
+      setNumber("");
+      setMessage(`${normalizedName} quedó inscrito con el número ${selectedNumber}.`);
+    } catch (error) {
+      console.error("No se pudo inscribir al jugador:", error);
+      setMessage(error.message || "No se pudo guardar la inscripción en Firebase.");
+    }
   }
 
-  function handleClearDraw() {
+  async function handleClearDraw() {
     if (!authenticated || people.length === 0) return;
     if (!window.confirm("¿Seguro que quieres limpiar el sorteo? Se eliminarán todos los jugadores inscritos.")) {
       return;
     }
 
-    setPeople([]);
-    setMessage("Sorteo limpiado. Ya puedes iniciar uno nuevo.");
+    try {
+      await clearDraw();
+      setMessage("Sorteo limpiado. Ya puedes iniciar uno nuevo.");
+    } catch (error) {
+      console.error("No se pudo limpiar el sorteo:", error);
+      setMessage(error.message || "No se pudo limpiar el sorteo en Firebase.");
+    }
+  }
+
+  async function handleTicketPriceChange(value) {
+    try {
+      await updateTicketPrice(Number(value));
+      setMessage("Precio actualizado.");
+    } catch (error) {
+      console.error("No se pudo actualizar el precio del puesto:", error);
+      setMessage(error.message || "No se pudo actualizar el precio en Firebase.");
+    }
   }
 
   return (
@@ -152,19 +128,20 @@ function HomePage({ authenticated, onLogin, onLogout }) {
             <Accumulated peopleCount={people.length} ticketPrice={ticketPrice} />
             {authenticated ? (
               <RegistrationForm
+                dataError={dataError}
+                dataStatus={dataStatus}
                 message={message}
                 name={name}
                 number={number}
-                onTicketPriceChange={(value) => setTicketPrice(Number(value))}
+                onTicketPriceChange={handleTicketPriceChange}
                 onNameChange={setName}
                 onNumberChange={setNumber}
                 onSubmit={handleAddPerson}
                 peopleCount={people.length}
-                storageError={storageError}
                 ticketPrice={ticketPrice}
               />
             ) : (
-              <AdminPanel ticketPrice={ticketPrice} />
+              <AdminPanel dataError={dataError} dataStatus={dataStatus} ticketPrice={ticketPrice} />
             )}
           </aside>
         </div>
