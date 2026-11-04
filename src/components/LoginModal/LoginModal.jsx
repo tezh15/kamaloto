@@ -7,6 +7,7 @@ function LoginModal({ onLogin, onContinueAsGuest }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const credentialsComplete = username.trim().length > 0 && password.length > 0;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -65,8 +66,12 @@ function LoginModal({ onLogin, onContinueAsGuest }) {
             />
           </div>
           {error && <p className="form-error" role="alert">{error}</p>}
-          <button className="button button-dark" disabled={submitting} type="submit">
-            {submitting ? "Iniciando sesión..." : "Entrar al sorteo"} <span aria-hidden="true">→</span>
+          <button
+            className="button button-dark"
+            disabled={submitting || !credentialsComplete}
+            type="submit"
+          >
+            {submitting ? "Iniciando sesión..." : "Ingresar como Organizador"} <span aria-hidden="true">→</span>
           </button>
         </form>
         <button
@@ -74,7 +79,7 @@ function LoginModal({ onLogin, onContinueAsGuest }) {
           onClick={onContinueAsGuest}
           type="button"
         >
-          Ingresar como visitante
+          Ingresar como Jugador
         </button>
       </section>
     </div>

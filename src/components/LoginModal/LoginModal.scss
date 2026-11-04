@@ -43,6 +43,25 @@
   margin-top: 6px;
 }
 
+.login-modal .button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.login-modal .button:disabled:hover {
+  transform: none;
+}
+
 .login-modal .guest-button {
   margin-top: 12px;
+  border-color: var(--color-primary);
+  background: rgb(var(--color-accent-rgb) / 9%);
+  box-shadow: 0 0 0 1px rgb(var(--color-accent-rgb) / 15%);
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.login-modal .guest-button:hover {
+  border-color: var(--color-accent);
+  background: rgb(var(--color-accent-rgb) / 18%);
+  box-shadow: 0 0 16px rgb(var(--color-accent-rgb) / 24%);
 }

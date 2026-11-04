@@ -152,7 +152,7 @@ function HomePage({ authenticated, onLogin, onLogout }) {
         </div>
         <p className="footer-note">¡Que Jiva te bendiga con la suerte necesaria!</p>
         <p className="footer-note2">© 2026 todos los derechos reservados - MalaCode</p>
-        <p className="footer-note3">Kamoloto es un proyecto comunitario sin animo de lucro y no está afiliado a Ankama Games. DOFUS y Ankama son marcas registradas de Ankama Games.</p>
+        <p className="footer-note3">Kamoloto es un proyecto comunitario sin animo de lucro y no está afiliado a Ankama Games.<br/>DOFUS y Ankama son marcas registradas de Ankama Games.</p>
       </main>
       {!authenticated && loginModalOpen && (
         <LoginModal
