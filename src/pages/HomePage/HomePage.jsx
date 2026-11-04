@@ -35,7 +35,7 @@ function HomePage({ authenticated, onLogin, onLogout }) {
     : null;
   const winnerKey = lotteryResult.result?.drawId || "";
   const totalPrize = people.length * ticketPrice;
-  const winnerPrize = totalPrize - Math.floor(totalPrize * 0.1);
+  const winnerPrize = totalPrize;
 
   async function handleLogout() {
     setLogoutError("");
