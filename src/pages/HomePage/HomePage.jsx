@@ -22,7 +22,7 @@ function HomePage({ authenticated, onLogin, onLogout }) {
     clearDraw,
     updateTicketPrice,
   } = useAppContext();
-  const [lotteryResult, setLotteryResult] = useState({ status: "loading", result: null });
+  const [lotteryResult, setLotteryResult] = useState({ status: "scheduled", result: null });
   const [dismissedWinnerKey, setDismissedWinnerKey] = useState("");
   const [loginModalOpen, setLoginModalOpen] = useState(!authenticated);
   const [name, setName] = useState("");
@@ -151,7 +151,7 @@ function HomePage({ authenticated, onLogin, onLogout }) {
           </aside>
         </div>
         <p className="footer-note">¡Que Jiva te bendiga con la suerte necesaria!</p>
-        <p className="footer-note2">© 2026 todos los derechos reservados - Dev Yerba</p>
+        <p className="footer-note2">© 2026 todos los derechos reservados - MalaCode</p>
         <p className="footer-note3">Kamoloto es un proyecto comunitario sin animo de lucro y no está afiliado a Ankama Games. DOFUS y Ankama son marcas registradas de Ankama Games.</p>
       </main>
       {!authenticated && loginModalOpen && (

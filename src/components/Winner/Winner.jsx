@@ -14,6 +14,11 @@ function Winner({ lotteryResult, people }) {
       {lotteryResult.status === "loading" && (
         <p className="winner-note">Consultando el número ganador…</p>
       )}
+      {lotteryResult.status === "scheduled" && (
+        <p className="winner-note">
+          El primer sorteo será el miércoles 11 de noviembre a las 10:30 p. m. (hora Colombia).
+        </p>
+      )}
       {lotteryResult.status === "error" && (
         <p className="winner-note">No se pudo consultar el resultado de la lotería.</p>
       )}
