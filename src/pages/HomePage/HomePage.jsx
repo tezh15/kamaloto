@@ -111,7 +111,12 @@ function HomePage({ authenticated, onLogin, onLogout }) {
           onLogout={handleLogout}
         />
         {logoutError && <p className="form-error" role="alert">{logoutError}</p>}
-        <HeroSection peopleCount={people.length} />
+        <HeroSection
+          authenticated={authenticated}
+          dataStatus={dataStatus}
+          people={people}
+          peopleCount={people.length}
+        />
 
         <div className="content-grid">
           <div className="list-stack">

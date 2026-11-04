@@ -39,6 +39,58 @@
   line-height: 1.7;
 }
 
+.number-checker {
+  max-width: 440px;
+  margin-top: 24px;
+}
+
+.number-checker label {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.number-checker-controls {
+  display: flex;
+  gap: 9px;
+}
+
+.number-checker-controls input {
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface-input);
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.number-checker-controls input::placeholder {
+  color: var(--color-muted);
+}
+
+.number-checker-controls .button {
+  flex-shrink: 0;
+}
+
+.number-checker-message {
+  margin: 9px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.number-checker-error {
+  color: var(--color-error);
+}
+
+.number-checker-free {
+  color: var(--color-success);
+}
+
 .hero-count {
   position: absolute;
   right: clamp(28px, 7vw, 80px);
@@ -63,6 +115,10 @@
 @media (max-width: 760px) {
   .hero {
     margin-top: 31px;
+  }
+
+  .number-checker {
+    max-width: none;
   }
 
   .hero-count {
