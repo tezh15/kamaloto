@@ -48,11 +48,16 @@ function PreviousResult({ onResultChange }) {
         }
 
         const payload = await response.json();
-        if (!Array.isArray(payload.data)) {
+        const results = Array.isArray(payload) ? payload : payload?.data;
+        if (!Array.isArray(results)) {
           throw new Error("La API no devolvió una lista de resultados.");
         }
 
-        const valle = payload.data.find((item) => item?.slug === "valle");
+        const valle = results.find(
+          (item) =>
+            item?.lottery?.toUpperCase() === "VALLE" ||
+            item?.slug?.toLowerCase() === "valle",
+        );
         if (!valle) {
           hasLoadedResult = true;
           lastResult = null;
