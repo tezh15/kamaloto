@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./PreviousResult.scss";
 
 const RESULTS_API_URL = "https://api-resultadosloterias.com/api/results";
-const FIRST_DRAW_DATE = "2026-11-11";
-const FIRST_DRAW_AT = Date.parse("2026-11-12T03:30:00.000Z");
+const REQUEST_TIMEOUT_MS = 30_000;
+const MAX_REQUEST_ATTEMPTS = 3;
 
 function parseGameDate(value) {
   if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
@@ -11,7 +11,6 @@ function parseGameDate(value) {
   }
   const date = new Date(value);
   return {
-    day: date.toISOString().slice(0, 10),
     display: new Intl.DateTimeFormat("es-CO", {
       day: "numeric",
       month: "long",
@@ -31,33 +30,61 @@ function PreviousResult({ onResultChange }) {
     let hasLoadedResult = false;
     let lastResult = null;
     let activeController = null;
-    let firstDrawTimeout = null;
     let refreshInterval = null;
 
-    async function loadResult() {
-      if (requestInFlight || disposed || Date.now() < FIRST_DRAW_AT) return;
-      requestInFlight = true;
-      const controller = new AbortController();
-      activeController = controller;
-      const timeoutId = window.setTimeout(() => controller.abort(), 10000);
+    async function fetchResults() {
+      for (let attempt = 0; attempt < MAX_REQUEST_ATTEMPTS; attempt += 1) {
+        if (disposed) return null;
 
-      try {
-        const response = await fetch(RESULTS_API_URL, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`La API respondió con estado ${response.status}.`);
+        const controller = new AbortController();
+        activeController = controller;
+        const timeoutId = window.setTimeout(
+          () => controller.abort(),
+          REQUEST_TIMEOUT_MS,
+        );
+        let response;
+
+        try {
+          response = await fetch(RESULTS_API_URL, { signal: controller.signal });
+        } catch (error) {
+          if (disposed) return null;
+          if (attempt === MAX_REQUEST_ATTEMPTS - 1) throw error;
+        } finally {
+          window.clearTimeout(timeoutId);
+          if (activeController === controller) activeController = null;
         }
 
+        if (response?.ok) return response;
+        if (response && response.status < 500) {
+          throw new Error(`La API respondió con estado ${response.status}.`);
+        }
+        if (attempt === MAX_REQUEST_ATTEMPTS - 1) {
+          throw new Error(
+            response
+              ? `La API respondió con estado ${response.status} después de varios intentos.`
+              : "La API no respondió después de varios intentos.",
+          );
+        }
+        await new Promise((resolve) => window.setTimeout(resolve, 1000 * (attempt + 1)));
+      }
+
+      return null;
+    }
+
+    async function loadResult() {
+      if (requestInFlight || disposed) return;
+      requestInFlight = true;
+
+      try {
+        const response = await fetchResults();
+        if (!response || disposed) return;
+
         const payload = await response.json();
-        const results = Array.isArray(payload) ? payload : payload?.data;
-        if (!Array.isArray(results)) {
+        if (!Array.isArray(payload?.data)) {
           throw new Error("La API no devolvió una lista de resultados.");
         }
 
-        const valle = results.find(
-          (item) =>
-            item?.lottery?.toUpperCase() === "VALLE" ||
-            item?.slug?.toLowerCase() === "valle",
-        );
+        const valle = payload.data.find((item) => item?.lottery === "VALLE");
         if (!valle) {
           hasLoadedResult = true;
           lastResult = null;
@@ -67,14 +94,6 @@ function PreviousResult({ onResultChange }) {
           return;
         }
         const gameDate = parseGameDate(valle.date);
-        if (gameDate.day < FIRST_DRAW_DATE) {
-          hasLoadedResult = true;
-          lastResult = null;
-          setResult(null);
-          onResultChange({ status: "loaded", result: null });
-          setStatus("loaded");
-          return;
-        }
         if (typeof valle.result !== "string" || !/^\d{2,}$/.test(valle.result)) {
           throw new Error("El resultado de la Lotería del Valle no tiene un formato válido.");
         }
@@ -100,25 +119,12 @@ function PreviousResult({ onResultChange }) {
         }
         setStatus("error");
       } finally {
-        window.clearTimeout(timeoutId);
-        if (activeController === controller) activeController = null;
         requestInFlight = false;
       }
     }
 
-    if (Date.now() >= FIRST_DRAW_AT) {
-      loadResult();
-      refreshInterval = window.setInterval(loadResult, 15 * 60 * 1000);
-    } else {
-      setStatus("scheduled");
-      onResultChange({ status: "scheduled", result: null });
-      firstDrawTimeout = window.setTimeout(() => {
-        setStatus("loading");
-        onResultChange({ status: "loading", result: null });
-        loadResult();
-        refreshInterval = window.setInterval(loadResult, 15 * 60 * 1000);
-      }, FIRST_DRAW_AT - Date.now());
-    }
+    loadResult();
+    refreshInterval = window.setInterval(loadResult, 15 * 60 * 1000);
 
     function handleVisibilityChange() {
       if (document.visibilityState === "visible") loadResult();
@@ -128,7 +134,6 @@ function PreviousResult({ onResultChange }) {
     return () => {
       disposed = true;
       activeController?.abort();
-      if (firstDrawTimeout !== null) window.clearTimeout(firstDrawTimeout);
       if (refreshInterval !== null) window.clearInterval(refreshInterval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
@@ -139,11 +144,6 @@ function PreviousResult({ onResultChange }) {
       <p className="eyebrow"><span className="eyebrow-dot" /> Número ganador</p>
       <h2 id="result-title">Lotería del Valle</h2>
       <p className="result-schedule">Juega cada miércoles</p>
-      {status === "scheduled" && (
-        <p className="result-note">
-          Primer sorteo: miércoles 11 de noviembre a las 10:30 p. m. (hora Colombia).
-        </p>
-      )}
       {status === "loading" && <p className="result-note">Consultando el resultado…</p>}
       {status === "error" && (
         <div className="result-fallback" role="status">
